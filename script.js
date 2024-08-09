@@ -1,13 +1,13 @@
-const board = ['', '', '', '', '', '', '', '', ''];
-let currentPlayer = 'X';
-let gameActive = true;
-const statusDisplay = document.querySelector('#status');
 const cells = document.querySelectorAll('.cell');
-const restartButton = document.querySelector('#restart-btn');
-const modeSelect = document.querySelector('#mode-select');
-let isAI = false;
+const statusText = document.getElementById('status');
+const resetButton = document.getElementById('resetButton');
+const aiToggleButton = document.getElementById('aiToggle');
+let board = ['', '', '', '', '', '', '', '', ''];
+let currentPlayer = 'X';
+let isGameOver = false;
+let againstAI = false;
 
-const winningConditions = [
+const winningCombinations = [
     [0, 1, 2],
     [3, 4, 5],
     [6, 7, 8],
@@ -18,82 +18,71 @@ const winningConditions = [
     [2, 4, 6]
 ];
 
-function handleCellPlayed(clickedCell, clickedCellIndex) {
-    board[clickedCellIndex] = currentPlayer;
-    clickedCell.innerHTML = currentPlayer;
-}
+cells.forEach(cell => {
+    cell.addEventListener('click', handleCellClick);
+});
 
-function handlePlayerChange() {
-    currentPlayer = currentPlayer === 'X' ? 'O' : 'X';
-}
-
-function handleResultValidation() {
-    let roundWon = false;
-    for (let i = 0; i < winningConditions.length; i++) {
-        const winCondition = winningConditions[i];
-        let a = board[winCondition[0]];
-        let b = board[winCondition[1]];
-        let c = board[winCondition[2]];
-        if (a === '' || b === '' || c === '') {
-            continue;
-        }
-        if (a === b && b === c) {
-            roundWon = true;
-            break;
-        }
-    }
-
-    if (roundWon) {
-        statusDisplay.innerHTML = `Player ${currentPlayer} wins!`;
-        gameActive = false;
-        return;
-    }
-
-    let roundDraw = !board.includes('');
-    if (roundDraw) {
-        statusDisplay.innerHTML = 'Game ended in a draw!';
-        gameActive = false;
-        return;
-    }
-
-    handlePlayerChange();
-}
+resetButton.addEventListener('click', resetGame);
+aiToggleButton.addEventListener('click', toggleAI);
 
 function handleCellClick(event) {
-    const clickedCell = event.target;
-    const clickedCellIndex = parseInt(clickedCell.getAttribute('id').split('-')[1]);
+    const cell = event.target;
+    const index = cell.getAttribute('data-index');
 
-    if (board[clickedCellIndex] !== '' || !gameActive) {
+    if (board[index] !== '' || isGameOver) {
         return;
     }
 
-    handleCellPlayed(clickedCell, clickedCellIndex);
-    handleResultValidation();
+    board[index] = currentPlayer;
+    cell.textContent = currentPlayer;
+    checkWinner();
 
-    if (isAI && gameActive && currentPlayer === 'O') {
-        handleAIPlay();
+    if (!isGameOver) {
+        currentPlayer = currentPlayer === 'X' ? 'O' : 'X';
+        if (againstAI && currentPlayer === 'O') {
+            aiMove();
+        }
     }
 }
 
-function handleAIPlay() {
-    let emptyCells = board.map((cell, index) => cell === '' ? index : null).filter(val => val !== null);
-    let randomIndex = emptyCells[Math.floor(Math.random() * emptyCells.length)];
-    let aiCell = document.getElementById(`cell-${randomIndex}`);
-    handleCellPlayed(aiCell, randomIndex);
-    handleResultValidation();
+function checkWinner() {
+    for (const combination of winningCombinations) {
+        const [a, b, c] = combination;
+        if (board[a] && board[a] === board[b] && board[a] === board[c]) {
+            isGameOver = true;
+            statusText.textContent = `${board[a]} wins!`;
+            return;
+        }
+    }
+
+    if (!board.includes('')) {
+        isGameOver = true;
+        statusText.textContent = 'It\'s a draw!';
+    }
 }
 
-function handleRestartGame() {
-    gameActive = true;
+function resetGame() {
+    board = ['', '', '', '', '', '', '', '', ''];
+    cells.forEach(cell => cell.textContent = '');
     currentPlayer = 'X';
-    board.fill('');
-    statusDisplay.innerHTML = '';
-    cells.forEach(cell => cell.innerHTML = '');
+    isGameOver = false;
+    statusText.textContent = '';
 }
 
-cells.forEach(cell => cell.addEventListener('click', handleCellClick));
-restartButton.addEventListener('click', handleRestartGame);
-modeSelect.addEventListener('change', (event) => {
-    isAI = event.target.value === 'ai';
-    handleRestartGame();
-});
+function toggleAI() {
+    againstAI = !againstAI;
+    aiToggleButton.textContent = `Play Against AI: ${againstAI ? 'On' : 'Off'}`;
+    resetGame();
+}
+
+function aiMove() {
+    const emptyCells = board.map((val, index) => val === '' ? index : null).filter(val => val !== null);
+    const randomIndex = emptyCells[Math.floor(Math.random() * emptyCells.length)];
+    board[randomIndex] = 'O';
+    cells[randomIndex].textContent = 'O';
+    checkWinner();
+    if (!isGameOver) {
+        currentPlayer = 'X';
+    }
+}
+
