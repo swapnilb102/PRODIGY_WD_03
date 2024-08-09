@@ -3,32 +3,29 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Tic-Tac-Toe</title>
+    <title>Tic Tac Toe</title>
     <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-    <h1>Tic-Tac-Toe</h1>
-    <div id="game-container">
-        <div id="game-board">
-            <div class="cell" id="cell-0"></div>
-            <div class="cell" id="cell-1"></div>
-            <div class="cell" id="cell-2"></div>
-            <div class="cell" id="cell-3"></div>
-            <div class="cell" id="cell-4"></div>
-            <div class="cell" id="cell-5"></div>
-            <div class="cell" id="cell-6"></div>
-            <div class="cell" id="cell-7"></div>
-            <div class="cell" id="cell-8"></div>
+    <div id="game">
+        <h1>Tic Tac Toe</h1>
+        <div id="board">
+            <div class="cell" data-index="0"></div>
+            <div class="cell" data-index="1"></div>
+            <div class="cell" data-index="2"></div>
+            <div class="cell" data-index="3"></div>
+            <div class="cell" data-index="4"></div>
+            <div class="cell" data-index="5"></div>
+            <div class="cell" data-index="6"></div>
+            <div class="cell" data-index="7"></div>
+            <div class="cell" data-index="8"></div>
         </div>
-        <div id="controls">
-            <button id="restart-btn">Restart Game</button>
-            <select id="mode-select">
-                <option value="2p">2 Players</option>
-                <option value="ai">Play Against AI</option>
-            </select>
-        </div>
+        <button id="resetButton">Reset Game</button>
+        <button id="aiToggle">Play Against AI: Off</button>
         <p id="status"></p>
     </div>
+
     <script src="script.js"></script>
 </body>
 </html>
+
